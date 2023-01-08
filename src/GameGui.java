@@ -3,31 +3,31 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.util.Random;
 
-public class Gui {
+public class GameGui {
     private JFrame frame = new JFrame();
     private JPanel buttonsPanel, topPanel;
     private JLabel targetValue, currentSum, movesLeft;
-
-    private Border debugBorder = BorderFactory.createLineBorder(Color.GREEN, 3);
     private Border defaultBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 
-    Gui() {
+    private GridButton[][] buttons;
+
+    GameGui(int x, int y) {
         // frame
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("More or less, less is more!");
         frame.setSize(800, 600);
-        frame.setResizable(false);
+        frame.setResizable(true);
 
         // panel
         buttonsPanel = new JPanel();
         buttonsPanel.setBorder(defaultBorder);
-        buttonsPanel.setLayout(new GridLayout(9,9));
+        buttonsPanel.setLayout(new GridLayout(x, y));
 
         // top panel
         topPanel = new JPanel(new GridLayout(0,3));
         topPanel.setBorder(defaultBorder);
 
-        addButtons();
+        changeButtonGridSize(x, y);
 
         targetValue = new JLabel("Target value:");
         targetValue.setHorizontalAlignment(JLabel.CENTER);
@@ -46,17 +46,37 @@ public class Gui {
 
         frame.add(topPanel, BorderLayout.NORTH);
         frame.add(buttonsPanel, BorderLayout.CENTER);
-        // frame.pack();
+        frame.pack();
         frame.setVisible(true);
     }
 
-    private void addButtons() {
+    public void changeButtonGridSize(int x, int y) {
+        buttons = new GridButton[x][y];
+        addButtons(x, y);
+    }
+
+    public void addButtons(int x, int y) {
         Random rand = new Random();
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                JButton b = new JButton("" + rand.nextInt(9));
-                buttonsPanel.add(b);
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                buttons[i][j] = new GridButton(rand.nextInt(9), i, j);
+                buttonsPanel.add(buttons[i][j]);
             }
         }
+    }
+
+    public void printTargetValue(int targetValue) {
+        this.targetValue.setText("Target value: " + targetValue);
+    }
+
+    public int updateCurrentSum(int rows, int cols) {
+        int sum = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                sum = sum + buttons[i][j].getValue();
+            }
+        }
+        currentSum.setText("Current sum: " + sum);
+        return sum;
     }
 }
