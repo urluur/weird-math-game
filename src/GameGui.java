@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class GameGui {
@@ -14,21 +16,46 @@ public class GameGui {
     private GridButton[][] buttons;
 
     GameGui() {
-        settings = new Settings();
-        // TODO: main menu
-        init(settings);
+        mainMenu();
     }
 
-    public void init(Settings settings){
+    public void mainMenu() {
+        mainMenu(new Settings());
+    }
+
+    public void mainMenu(Settings settings) {
         this.settings = settings;
-        movesLeft = settings.getMovesLeft();
 
         // frame
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("More or less, less is more!");
-        frame.setSize(800, 600);
         frame.setResizable(true);
         frame.setLocationRelativeTo(null);
+
+        JPanel mainMenuPanel = new JPanel(new BorderLayout());
+        JPanel startGamePanel = new JPanel(new GridLayout(1, 2));
+        JButton startNewGameButton = new JButton("Start new game!");
+        startNewGameButton.addActionListener(e -> {
+            frame.remove(mainMenuPanel);
+            init();
+        });
+        JButton loadFileButton = new JButton("Load from file...");
+        loadFileButton.addActionListener(e -> {
+            // TODO: add function for loading from file
+        });
+        loadFileButton.setEnabled(false);
+
+        startGamePanel.add(startNewGameButton);
+        startGamePanel.add(loadFileButton);
+
+        mainMenuPanel.add(startGamePanel, BorderLayout.SOUTH);
+        frame.add(mainMenuPanel);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public void init(){
+        movesLeft = settings.getMovesLeft();
 
         gamePanel = new JPanel(new BorderLayout());
 
@@ -87,7 +114,7 @@ public class GameGui {
     }
 
     public void printTargetValue() {
-        this.targetValueLabel.setText("Target value: " + buttons[0][0].fromDoubleFormatString(settings.getTargetValue()));
+        this.targetValueLabel.setText("Target value: " + buttons[0][0].dblToFStr(settings.getTargetVal()));
     }
 
     public double updateCurrentSum(int rows, int cols) {
@@ -98,7 +125,7 @@ public class GameGui {
                 sum = sum + buttons[i][j].getValue();
             }
         }
-        currentSumLabel.setText("Current sum: " + buttons[0][0].fromDoubleFormatString(sum)); // would be better to use a static function
+        currentSumLabel.setText("Current sum: " + buttons[0][0].dblToFStr(sum)); // would be better to use a static function
         return sum;
     }
 
@@ -138,9 +165,10 @@ public class GameGui {
                 double arg1 = buttons[selectedButtonRow][selectedButtonCol].getValue();
                 double arg2 = buttons[currentX][currentY].getValue();
                 switch (settings.getOperator()) {
-                    case '+':
-                        result = arg1 + arg2;
-                        break;
+                    case '+' -> result = arg1 + arg2;
+                    case '-' -> result = arg1 - arg2;
+                    case '*' -> result = arg1 * arg2;
+                    case '/' -> result = arg1 / arg2;
                 }
                 result = result % 10;
                 buttons[selectedButtonRow][selectedButtonCol].setValue(result);
@@ -176,54 +204,41 @@ public class GameGui {
     public void moveDone(boolean init) {
         if (!init) {
             movesLeft--;
-            if (movesLeft <= 0 && updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols()) != settings.getTargetValue()) {
-                gameOver();
-            } else if (updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols()) == settings.getTargetValue()) {
-                youWin();
+            double points = updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols());
+            if (movesLeft <= 0 && points != settings.getTargetVal()) {
+                String pointsStr = "You were " + buttons[0][0].dblToFStr(Math.abs(settings.getTargetVal() - points));
+                postGame("YOU LOST! " + pointsStr + " point/s away from target number.");
+            } else if (updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols()) == settings.getTargetVal()) {
+                postGame("YOU WIN!");
             }
         }
-        movesLeftLabel.setText("Moves left: " + buttons[0][0].fromDoubleFormatString(movesLeft));
+        movesLeftLabel.setText("Moves left: " + buttons[0][0].dblToFStr(movesLeft));
     }
 
-    public void gameOver() {
+
+    public void postGame(String labelText) {
         frame.remove(gamePanel);
-        frame.setVisible(false);
-        frame.setVisible(true);
 
-        JPanel gameOverPanel = new JPanel(new BorderLayout());
-        JLabel gameOverLabel = new JLabel("GAME OVER");
-        gameOverLabel.setHorizontalAlignment(JLabel.CENTER);
-        gameOverPanel.add(gameOverLabel, BorderLayout.CENTER);
+        JPanel postGamePanel = new JPanel(new BorderLayout());
+        JPanel whatsNextButtons = new JPanel(new GridLayout(1, 2));
 
-        JButton retry = new JButton("retry");
-        retry.addActionListener(e -> {
-            init(settings);
-            frame.remove(gameOverPanel);
-            frame.setVisible(false);
-            frame.setVisible(true);
+        JLabel postGameLabel = new JLabel(labelText);
+        postGameLabel.setHorizontalAlignment(JLabel.CENTER);
+        postGamePanel.add(postGameLabel);
+
+        JButton changeSettingsButton = new JButton("Main menu...");
+        changeSettingsButton.addActionListener(e -> {
+            frame.remove(postGamePanel);
+            mainMenu(settings);
         });
-        gameOverPanel.add(retry, BorderLayout.SOUTH);
-        frame.add(gameOverPanel);
-    }
-
-    public void youWin() {
-        frame.remove(gamePanel);
-        frame.setVisible(false);
-        frame.setVisible(true);
-
-        JPanel youWinPanel = new JPanel(new BorderLayout());
-        JLabel youWinLabel = new JLabel("YOU WIN");
-        youWinLabel.setHorizontalAlignment(JLabel.CENTER);
-        youWinPanel.add(youWinLabel, BorderLayout.CENTER);
-
-        JButton retry = new JButton("retry");
-        retry.addActionListener(e -> {
-            init(settings);
-            frame.remove(youWinPanel);
-            frame.setVisible(false);
-            frame.setVisible(true);
+        JButton playAgainButton = new JButton("Play again!");
+        playAgainButton.addActionListener(e -> {
+            frame.remove(postGamePanel);
+            init();
         });
-        youWinPanel.add(retry, BorderLayout.SOUTH);
-        frame.add(youWinPanel);
+        whatsNextButtons.add(playAgainButton);
+        whatsNextButtons.add(changeSettingsButton);
+        postGamePanel.add(whatsNextButtons, BorderLayout.SOUTH);
+        frame.add(postGamePanel);
     }
 }

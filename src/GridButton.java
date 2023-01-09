@@ -25,10 +25,10 @@ public class GridButton extends JButton {
 
     public void setValue(double value) {
         this.value = value;
-        this.setText(fromDoubleFormatString(value));
+        this.setText(dblToFStr(value));
     }
 
-    public String fromDoubleFormatString (double in) {
+    public String dblToFStr(double in) {
         String strValue = in + "";
         if (strValue.endsWith(".0")) {
             strValue = strValue.replace(".0", "");

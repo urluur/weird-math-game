@@ -1,5 +1,5 @@
 public class Settings {
-    private int numOfRows = 7, numOfCols = 5, movesLeft = 20;
+    private int numOfRows = 7, numOfCols = 5, movesLeft = 5;
     private double targetValue = 150;
     private char operator = '+';
 
@@ -27,7 +27,7 @@ public class Settings {
         this.movesLeft = movesLeft;
     }
 
-    public double getTargetValue() {
+    public double getTargetVal() {
         return targetValue;
     }
 
