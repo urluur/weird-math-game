@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5106c5e6-e730-4ad6-9067-c275ef34aa9a" name="Changes" comment="Fixed layout">
+      <change afterPath="$PROJECT_DIR$/src/Settings.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameGui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameGui.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GridButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridButton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/VDN2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/VDN2.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,6 +126,8 @@
       <workItem from="1673253989711" duration="1287000" />
       <workItem from="1673255306113" duration="969000" />
       <workItem from="1673256294128" duration="1224000" />
+      <workItem from="1673258079616" duration="2571000" />
+      <workItem from="1673261179264" duration="9620000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed layout">
       <created>1672337686887</created>

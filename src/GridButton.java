@@ -1,9 +1,8 @@
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class GridButton extends JButton {
-    private int row, col, value;
+    private final int row, col;
+    private double value;
 
     GridButton(int randomNumber, int row, int col) {
         super(randomNumber + "");
@@ -20,12 +19,20 @@ public class GridButton extends JButton {
         return col;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
-        this.setText(value + "");
+        this.setText(fromDoubleFormatString(value));
+    }
+
+    public String fromDoubleFormatString (double in) {
+        String strValue = in + "";
+        if (strValue.endsWith(".0")) {
+            strValue = strValue.replace(".0", "");
+        }
+        return strValue;
     }
 }
