@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class GameGui {
@@ -8,6 +10,7 @@ public class GameGui {
     private JPanel buttonsPanel, topPanel;
     private JLabel targetValue, currentSum, movesLeft;
     private Border defaultBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+    private int selectedButtonRow, selectedButtonCol;
 
     private GridButton[][] buttons;
 
@@ -63,6 +66,7 @@ public class GameGui {
                 buttonsPanel.add(buttons[i][j]);
             }
         }
+        addButtonActionListeners(x, y);
     }
 
     public void printTargetValue(int targetValue) {
@@ -78,5 +82,36 @@ public class GameGui {
         }
         currentSum.setText("Current sum: " + sum);
         return sum;
+    }
+
+    public void setSelectedButtonRow(int selectedButtonRow) {
+        this.selectedButtonRow = selectedButtonRow;
+    }
+
+    public void setSelectedButtonCol(int selectedButtonCol) {
+        this.selectedButtonCol = selectedButtonCol;
+    }
+
+    public int getSelectedButtonRow() {
+        return selectedButtonRow;
+    }
+
+    public int getSelectedButtonCol() {
+        return selectedButtonCol;
+    }
+
+    public void addButtonActionListeners(int row, int col) {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                addButtonActionListener(i, j);
+            }
+        }
+    }
+    public void addButtonActionListener(int i, int j) {
+        buttons[i][j].addActionListener(e -> {
+            selectedButtonRow = buttons[i][j].getRow();
+            selectedButtonCol = buttons[i][j].getCol();
+            System.out.println(selectedButtonRow + " " + selectedButtonCol);
+        });
     }
 }
