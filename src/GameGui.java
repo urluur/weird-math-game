@@ -1,5 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,10 +31,104 @@ public class GameGui {
         // frame
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("More or less, less is more!");
-        frame.setResizable(true);
+        frame.setResizable(false);
         frame.setLocationRelativeTo(null);
 
         JPanel mainMenuPanel = new JPanel(new BorderLayout());
+        JPanel settingsPanel = new JPanel(new GridLayout(2, 1));
+        JPanel spinnersPanel = new JPanel(new GridLayout(2, 2));
+        JPanel labelAndSpinnerPanels[] = new JPanel[4];
+        for (int i = 0; i < 4; i++) {
+            labelAndSpinnerPanels[i] = new JPanel(new GridLayout(1, 2));
+        }
+        JPanel difficultyPresetsPanel = new JPanel(new GridLayout(1, 4));
+
+        // spinners
+        /*
+        sources:
+        https://docs.oracle.com/javase/7/docs/api/javax/swing/JSpinner.html
+        https://docs.oracle.com/javase/7/docs/api/javax/swing/SpinnerNumberModel.html
+        */
+
+        // rows
+        JLabel rowsLabel = new JLabel("Rows: ");
+        rowsLabel.setHorizontalAlignment(JLabel.CENTER);
+        SpinnerModel value = new SpinnerNumberModel(
+                settings.getNumOfRows(), // default value
+                3, // minimum number of rows
+                10, // maximum number of rows
+                1 // spinner step
+        );
+        JSpinner spinner = new JSpinner(value);
+        spinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+
+            }
+        });
+        labelAndSpinnerPanels[0].add(rowsLabel);
+        labelAndSpinnerPanels[0].add(spinner);
+
+        // columns
+        JLabel colsLabel = new JLabel("Columns: ");
+        colsLabel.setHorizontalAlignment(JLabel.CENTER);
+        value = new SpinnerNumberModel(
+                settings.getNumOfCols(), // default value
+                3, // minimum number of columns
+                10, // maximum number of columns
+                1 // spinner step
+        );
+        spinner = new JSpinner(value);
+        spinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+
+            }
+        });
+        labelAndSpinnerPanels[1].add(colsLabel);
+        labelAndSpinnerPanels[1].add(spinner);
+
+        // Target value
+        JLabel targetValueLabel = new JLabel("Target value: ");
+        targetValueLabel.setHorizontalAlignment(JLabel.CENTER);
+        value = new SpinnerNumberModel(
+                settings.getTargetVal(), // default value
+                1, // minimum target value
+                200, // maximum target value
+                1 // spinner step
+        );
+        spinner = new JSpinner(value);
+        spinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+
+            }
+        });
+        labelAndSpinnerPanels[2].add(targetValueLabel);
+        labelAndSpinnerPanels[2].add(spinner);
+
+        // Available moves
+        JLabel movesValueLabel = new JLabel("Available moves: ");
+        movesValueLabel.setHorizontalAlignment(JLabel.CENTER);
+        value = new SpinnerNumberModel(
+                settings.getMovesLeft(), // default value
+                1, // minimum moves
+                99, // maximum moves
+                1 // spinner step
+        );
+        spinner = new JSpinner(value);
+        spinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+
+            }
+        });
+        labelAndSpinnerPanels[3].add(movesValueLabel);
+        labelAndSpinnerPanels[3].add(spinner);
+        // that's it for spinners
+
+
+        // start game buttons
         JPanel startGamePanel = new JPanel(new GridLayout(1, 2));
         JButton startNewGameButton = new JButton("Start new game!");
         startNewGameButton.addActionListener(e -> {
@@ -45,9 +141,38 @@ public class GameGui {
         });
         loadFileButton.setEnabled(false);
 
+        // TODO: preset buttons change settings and spinner values
+        JButton easyPresetButton = new JButton("Easy");
+        easyPresetButton.setEnabled(false);
+        JButton mediumPresetButton = new JButton("Medium");
+        mediumPresetButton.setEnabled(false);
+        JButton hardPresetButton = new JButton("Hard");
+        hardPresetButton.setEnabled(false);
+
+        JLabel presetsLabel = new JLabel("Presets:");
+        presetsLabel.setHorizontalAlignment(JLabel.CENTER);
+        difficultyPresetsPanel.add(presetsLabel);
+        difficultyPresetsPanel.add(easyPresetButton);
+        difficultyPresetsPanel.add(mediumPresetButton);
+        difficultyPresetsPanel.add(hardPresetButton);
+
+        for (int i = 0; i < 4; i++) {
+            labelAndSpinnerPanels[i].setBorder(
+                    BorderFactory.createEmptyBorder(2, 5, 2, 5)
+            );
+            spinnersPanel.add(labelAndSpinnerPanels[i]);
+        }
+
+        settingsPanel.add(spinnersPanel);
+        difficultyPresetsPanel.setBorder(
+                BorderFactory.createEmptyBorder(10, 2, 10, 2)
+        );
+        settingsPanel.add(difficultyPresetsPanel);
+
         startGamePanel.add(startNewGameButton);
         startGamePanel.add(loadFileButton);
 
+        mainMenuPanel.add(settingsPanel, BorderLayout.CENTER);
         mainMenuPanel.add(startGamePanel, BorderLayout.SOUTH);
         frame.add(mainMenuPanel);
         frame.pack();
@@ -56,6 +181,7 @@ public class GameGui {
 
     public void init(){
         movesLeft = settings.getMovesLeft();
+        frame.setResizable(true);
 
         gamePanel = new JPanel(new BorderLayout());
 
@@ -70,9 +196,18 @@ public class GameGui {
 
         changeButtonGridSize(settings.getNumOfRows(), settings.getNumOfCols());
 
+        JButton saveButton = new JButton("Save & Quit");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        saveButton.setEnabled(false);
+        topPanel.add(saveButton);
+
         targetValueLabel = new JLabel("Target value:");
         targetValueLabel.setHorizontalAlignment(JLabel.CENTER);
-        topPanel.add(new JLabel());
         topPanel.add(targetValueLabel, BorderLayout.CENTER);
 
         currentSumLabel = new JLabel("Current sum:");

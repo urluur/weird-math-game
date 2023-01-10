@@ -7,8 +7,6 @@
     <list default="true" id="5106c5e6-e730-4ad6-9067-c275ef34aa9a" name="Changes" comment="Fixed layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameGui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameGui.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GridButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridButton.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Settings.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,6 +126,11 @@
       <workItem from="1673261179264" duration="9695000" />
       <workItem from="1673273930924" duration="7833000" />
       <workItem from="1673282589842" duration="4759000" />
+      <workItem from="1673291152431" duration="670000" />
+      <workItem from="1673339971983" duration="280000" />
+      <workItem from="1673340350170" duration="649000" />
+      <workItem from="1673341098966" duration="758000" />
+      <workItem from="1673341940484" duration="4662000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed layout">
       <created>1672337686887</created>
@@ -156,20 +159,5 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed layout" />
     <option name="LAST_COMMIT_MESSAGE" value="Fixed layout" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/GameGui.java</url>
-          <line>203</line>
-          <properties class="GameGui" method="moveDone">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
