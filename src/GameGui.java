@@ -5,9 +5,9 @@ import java.util.Random;
 
 public class GameGui {
     private final JFrame frame = new JFrame();
-    private JPanel gamePanel;
-    private JPanel buttonsPanel;
+    private JPanel gamePanel, buttonsPanel, nextOperatorsPanel;
     private JLabel targetValueLabel, currentSumLabel, movesLeftLabel;
+    private JLabel[] operatorsLabels;
     private final Border defaultBorder = BorderFactory.createEmptyBorder(5, 10, 5, 10);
     private int selectedButtonRow = -1, selectedButtonCol = -1;
     private int movesLeft;
@@ -172,11 +172,19 @@ public class GameGui {
         buttonsPanel.setBorder(defaultBorder);
         buttonsPanel.setLayout(new GridLayout(settings.getNumOfRows(), settings.getNumOfCols()));
 
+
         // top panel
         JPanel topPanel = new JPanel(new GridLayout(0, 3));
         topPanel.setBorder(defaultBorder);
 
         changeButtonGridSize(settings.getNumOfRows(), settings.getNumOfCols());
+
+        // next operators panel
+        nextOperatorsPanel = new JPanel(new GridLayout(settings.getNumOfRows(), 1));
+        nextOperatorsPanel.setBorder(
+                BorderFactory.createEmptyBorder(5, 5, 5, 15)
+        );
+        setupNextOperators();
 
         JButton saveButton = new JButton("Save & Quit");
         saveButton.addActionListener(e -> {
@@ -204,6 +212,7 @@ public class GameGui {
 
         gamePanel.add(topPanel, BorderLayout.NORTH);
         gamePanel.add(buttonsPanel, BorderLayout.CENTER);
+        gamePanel.add(nextOperatorsPanel, BorderLayout.EAST);
         frame.add(gamePanel);
         frame.pack();
         frame.setVisible(true);
@@ -235,6 +244,53 @@ public class GameGui {
             }
         }
         addButtonActionListeners(x, y);
+    }
+    
+    public void setupNextOperators() {
+        operatorsLabels = new JLabel[settings.getNumOfRows()];
+        for (int i = 0; i < settings.getNumOfRows(); i++) {
+            operatorsLabels[i] = new JLabel(getRandOperator());
+            if(i < movesLeft) {
+                if (i == 0) {
+                    operatorsLabels[i].setFont(new Font("Arial", Font.BOLD, 22));
+                    operatorsLabels[i].setHorizontalAlignment(JLabel.LEFT);
+                }
+                else {
+                    operatorsLabels[i].setHorizontalAlignment(JLabel.CENTER);
+                }
+                nextOperatorsPanel.add(operatorsLabels[i]);
+            }
+
+        }
+    }
+
+    public void updateOperators() {
+        for (int i = 0; i < operatorsLabels.length - 1; i++) {
+            operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
+        }
+        operatorsLabels[operatorsLabels.length - 1].setText(getRandOperator());
+    }
+
+    public String getRandOperator() {
+        Random random = new Random();
+        switch (random.nextInt(4)) {
+            case 0 -> {
+                return "+";
+            }
+            case 1 -> {
+                return "-";
+            }
+            case 2 -> {
+                return "*";
+            }
+            case 3 -> {
+                return "/";
+            }
+            default -> {
+                System.out.println("Error: random operator!");
+                return "error";
+            }
+        }
     }
 
     public void printTargetValue() {
@@ -272,30 +328,36 @@ public class GameGui {
                 int result = 0;
                 int arg1 = buttons[selectedButtonRow][selectedButtonCol].getValue();
                 int arg2 = buttons[currentX][currentY].getValue();
-                switch (settings.getOperator()) {
-                    case '+' -> result = arg1 + arg2;
-                    case '-' -> result = arg1 - arg2;
-                    case '*' -> result = arg1 * arg2;
-                    case '/' -> result = arg1 / arg2;
+                switch (operatorsLabels[0].getText()) {
+                    case "+" -> result = arg1 + arg2;
+                    case "-" -> result = arg1 - arg2;
+                    case "*" -> result = arg1 * arg2;
+                    case "/" -> result = arg1 / arg2;
                 }
-                result = result % 10;
+                result = Math.abs(result % 10);
                 buttons[selectedButtonRow][selectedButtonCol].setValue(result);
+                if (selectedButtonRow != -1) {
+                    updateOperators();
+                }
                 selectedButtonRow = buttons[currentX][currentY].getRow();
                 selectedButtonCol = buttons[currentX][currentY].getCol();
                 createAvailableButtonsCross(maxRow, maxCol);
                 updateCurrentSum(maxRow, maxCol);
+                moveDone(); // subtracts 1 from movesLeft and updates label
             }
-            moveDone(); // subtracts 1 from movesLeft and updates label
         });
     }
 
     public void createAvailableButtonsCross(int maxRow, int maxCol) {
         for (int i = 0; i < maxRow; i++) {
             for (int j = 0; j < maxCol; j++) {
-                if (selectedButtonRow == i && selectedButtonCol == j) {
+                if ((selectedButtonRow == i && selectedButtonCol == j) ||
+                    (operatorsLabels[0].getText().equals("/") && buttons[i][j].getText().equals("0"))
+                ) {
                     buttons[i][j].setEnabled(false);
+                } else {
+                    buttons[i][j].setEnabled(selectedButtonRow == i || selectedButtonCol == j);
                 }
-                else buttons[i][j].setEnabled(selectedButtonRow == i || selectedButtonCol == j);
             }
         }
     }
@@ -318,8 +380,6 @@ public class GameGui {
         movesLeftLabel.setText("Moves left: " + movesLeft);
         frame.revalidate();
     }
-
-
     public void postGame(String labelText) {
         frame.remove(gamePanel);
         JPanel postGamePanel = new JPanel(new BorderLayout());
