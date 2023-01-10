@@ -7,6 +7,8 @@
     <list default="true" id="5106c5e6-e730-4ad6-9067-c275ef34aa9a" name="Changes" comment="Fixed layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameGui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameGui.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/GridButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GridButton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Settings.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +60,7 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.ide.settings.new.ui&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -131,6 +133,9 @@
       <workItem from="1673340350170" duration="649000" />
       <workItem from="1673341098966" duration="758000" />
       <workItem from="1673341940484" duration="4662000" />
+      <workItem from="1673347357757" duration="1422000" />
+      <workItem from="1673348789945" duration="2042000" />
+      <workItem from="1673350844496" duration="3842000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed layout">
       <created>1672337686887</created>

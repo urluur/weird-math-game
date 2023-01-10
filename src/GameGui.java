@@ -1,21 +1,19 @@
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class GameGui {
-    private JFrame frame = new JFrame();
-    private JPanel gamePanel, buttonsPanel, topPanel;
+    private final JFrame frame = new JFrame();
+    private JPanel gamePanel;
+    private JPanel buttonsPanel;
     private JLabel targetValueLabel, currentSumLabel, movesLeftLabel;
-    private Border defaultBorder = BorderFactory.createEmptyBorder(5, 10, 5, 10);
+    private final Border defaultBorder = BorderFactory.createEmptyBorder(5, 10, 5, 10);
     private int selectedButtonRow = -1, selectedButtonCol = -1;
     private int movesLeft;
     private Settings settings;
     private GridButton[][] buttons;
+    private JSpinner rowSpinner, colSpinner, targetSpinner, moveSpinner;
 
     GameGui() {
         mainMenu();
@@ -37,7 +35,7 @@ public class GameGui {
         JPanel mainMenuPanel = new JPanel(new BorderLayout());
         JPanel settingsPanel = new JPanel(new GridLayout(2, 1));
         JPanel spinnersPanel = new JPanel(new GridLayout(2, 2));
-        JPanel labelAndSpinnerPanels[] = new JPanel[4];
+        JPanel[] labelAndSpinnerPanels = new JPanel[4];
         for (int i = 0; i < 4; i++) {
             labelAndSpinnerPanels[i] = new JPanel(new GridLayout(1, 2));
         }
@@ -52,79 +50,55 @@ public class GameGui {
 
         // rows
         JLabel rowsLabel = new JLabel("Rows: ");
-        rowsLabel.setHorizontalAlignment(JLabel.CENTER);
+        rowsLabel.setHorizontalAlignment(JLabel.RIGHT);
         SpinnerModel value = new SpinnerNumberModel(
                 settings.getNumOfRows(), // default value
-                3, // minimum number of rows
+                2, // minimum number of rows
                 10, // maximum number of rows
                 1 // spinner step
         );
-        JSpinner spinner = new JSpinner(value);
-        spinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-
-            }
-        });
+        rowSpinner = new JSpinner(value);
         labelAndSpinnerPanels[0].add(rowsLabel);
-        labelAndSpinnerPanels[0].add(spinner);
+        labelAndSpinnerPanels[0].add(rowSpinner);
 
         // columns
         JLabel colsLabel = new JLabel("Columns: ");
-        colsLabel.setHorizontalAlignment(JLabel.CENTER);
+        colsLabel.setHorizontalAlignment(JLabel.RIGHT);
         value = new SpinnerNumberModel(
                 settings.getNumOfCols(), // default value
-                3, // minimum number of columns
+                2, // minimum number of columns
                 10, // maximum number of columns
                 1 // spinner step
         );
-        spinner = new JSpinner(value);
-        spinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-
-            }
-        });
+        colSpinner = new JSpinner(value);
         labelAndSpinnerPanels[1].add(colsLabel);
-        labelAndSpinnerPanels[1].add(spinner);
+        labelAndSpinnerPanels[1].add(colSpinner);
 
         // Target value
         JLabel targetValueLabel = new JLabel("Target value: ");
-        targetValueLabel.setHorizontalAlignment(JLabel.CENTER);
+        targetValueLabel.setHorizontalAlignment(JLabel.RIGHT);
         value = new SpinnerNumberModel(
                 settings.getTargetVal(), // default value
                 1, // minimum target value
-                200, // maximum target value
+                300, // maximum target value
                 1 // spinner step
         );
-        spinner = new JSpinner(value);
-        spinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-
-            }
-        });
+        targetSpinner = new JSpinner(value);
         labelAndSpinnerPanels[2].add(targetValueLabel);
-        labelAndSpinnerPanels[2].add(spinner);
+        labelAndSpinnerPanels[2].add(targetSpinner);
 
         // Available moves
         JLabel movesValueLabel = new JLabel("Available moves: ");
-        movesValueLabel.setHorizontalAlignment(JLabel.CENTER);
+        movesValueLabel.setHorizontalAlignment(JLabel.RIGHT);
         value = new SpinnerNumberModel(
                 settings.getMovesLeft(), // default value
                 1, // minimum moves
                 99, // maximum moves
                 1 // spinner step
         );
-        spinner = new JSpinner(value);
-        spinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-
-            }
-        });
+        moveSpinner = new JSpinner(value);
         labelAndSpinnerPanels[3].add(movesValueLabel);
-        labelAndSpinnerPanels[3].add(spinner);
+        labelAndSpinnerPanels[3].add(moveSpinner);
         // that's it for spinners
 
 
@@ -132,6 +106,10 @@ public class GameGui {
         JPanel startGamePanel = new JPanel(new GridLayout(1, 2));
         JButton startNewGameButton = new JButton("Start new game!");
         startNewGameButton.addActionListener(e -> {
+            settings.setNumOfRows((int) rowSpinner.getValue());
+            settings.setNumOfCols((int) colSpinner.getValue());
+            settings.setTargetValue((int) targetSpinner.getValue());
+            settings.setMovesLeft((int) moveSpinner.getValue());
             frame.remove(mainMenuPanel);
             init();
         });
@@ -141,13 +119,14 @@ public class GameGui {
         });
         loadFileButton.setEnabled(false);
 
-        // TODO: preset buttons change settings and spinner values
         JButton easyPresetButton = new JButton("Easy");
-        easyPresetButton.setEnabled(false);
+        easyPresetButton.addActionListener(e -> setSpinnersTo(3, 3, 50, 20));
+
         JButton mediumPresetButton = new JButton("Medium");
-        mediumPresetButton.setEnabled(false);
+        mediumPresetButton.addActionListener(e -> setSpinnersTo(5, 5, 150, 15));
+
         JButton hardPresetButton = new JButton("Hard");
-        hardPresetButton.setEnabled(false);
+        hardPresetButton.addActionListener(e -> setSpinnersTo(7, 7, 300, 10));
 
         JLabel presetsLabel = new JLabel("Presets:");
         presetsLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -177,9 +156,12 @@ public class GameGui {
         frame.add(mainMenuPanel);
         frame.pack();
         frame.setVisible(true);
+        frame.revalidate();
     }
 
     public void init(){
+        selectedButtonRow = -1;
+        selectedButtonCol = -1;
         movesLeft = settings.getMovesLeft();
         frame.setResizable(true);
 
@@ -191,17 +173,16 @@ public class GameGui {
         buttonsPanel.setLayout(new GridLayout(settings.getNumOfRows(), settings.getNumOfCols()));
 
         // top panel
-        topPanel = new JPanel(new GridLayout(0,3));
+        JPanel topPanel = new JPanel(new GridLayout(0, 3));
         topPanel.setBorder(defaultBorder);
 
         changeButtonGridSize(settings.getNumOfRows(), settings.getNumOfCols());
 
         JButton saveButton = new JButton("Save & Quit");
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
+        saveButton.addActionListener(e -> {
+            // TODO: create function for saving
+            System.out.println("saved");
+            System.out.println("i swear");
         });
         saveButton.setEnabled(false);
         topPanel.add(saveButton);
@@ -230,11 +211,19 @@ public class GameGui {
         printTargetValue();
         updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols());
         moveDone(true);
+        frame.revalidate();
     }
 
     public void changeButtonGridSize(int x, int y) {
         buttons = new GridButton[x][y];
         addButtons(x, y);
+    }
+
+    public void setSpinnersTo(int rows, int cols, int target, int moves) {
+        rowSpinner.setValue(rows);
+        colSpinner.setValue(cols);
+        targetSpinner.setValue(target);
+        moveSpinner.setValue(moves);
     }
 
     public void addButtons(int x, int y) {
@@ -249,35 +238,19 @@ public class GameGui {
     }
 
     public void printTargetValue() {
-        this.targetValueLabel.setText("Target value: " + buttons[0][0].dblToFStr(settings.getTargetVal()));
+        this.targetValueLabel.setText("Target value: " + settings.getTargetVal());
     }
 
-    public double updateCurrentSum(int rows, int cols) {
-        double sum = 0;
+    public int updateCurrentSum(int rows, int cols) {
+        int sum = 0;
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 sum = sum + buttons[i][j].getValue();
             }
         }
-        currentSumLabel.setText("Current sum: " + buttons[0][0].dblToFStr(sum)); // would be better to use a static function
+        currentSumLabel.setText("Current sum: " + sum);
         return sum;
-    }
-
-    public void setSelectedButtonRow(int selectedButtonRow) {
-        this.selectedButtonRow = selectedButtonRow;
-    }
-
-    public void setSelectedButtonCol(int selectedButtonCol) {
-        this.selectedButtonCol = selectedButtonCol;
-    }
-
-    public int getSelectedButtonRow() {
-        return selectedButtonRow;
-    }
-
-    public int getSelectedButtonCol() {
-        return selectedButtonCol;
     }
 
     public void addButtonActionListeners(int maxRow, int maxCol) {
@@ -296,9 +269,9 @@ public class GameGui {
                 createAvailableButtonsCross(maxRow, maxCol);
             }
             else { // all other buttons clicked after first one
-                double result = 0;
-                double arg1 = buttons[selectedButtonRow][selectedButtonCol].getValue();
-                double arg2 = buttons[currentX][currentY].getValue();
+                int result = 0;
+                int arg1 = buttons[selectedButtonRow][selectedButtonCol].getValue();
+                int arg2 = buttons[currentX][currentY].getValue();
                 switch (settings.getOperator()) {
                     case '+' -> result = arg1 + arg2;
                     case '-' -> result = arg1 - arg2;
@@ -322,12 +295,7 @@ public class GameGui {
                 if (selectedButtonRow == i && selectedButtonCol == j) {
                     buttons[i][j].setEnabled(false);
                 }
-                else if (selectedButtonRow == i || selectedButtonCol == j) {
-                    buttons[i][j].setEnabled(true);
-                }
-                else {
-                    buttons[i][j].setEnabled(false);
-                }
+                else buttons[i][j].setEnabled(selectedButtonRow == i || selectedButtonCol == j);
             }
         }
     }
@@ -339,26 +307,29 @@ public class GameGui {
     public void moveDone(boolean init) {
         if (!init) {
             movesLeft--;
-            double points = updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols());
+            int points = updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols());
             if (movesLeft <= 0 && points != settings.getTargetVal()) {
-                String pointsStr = "You were " + buttons[0][0].dblToFStr(Math.abs(settings.getTargetVal() - points));
+                String pointsStr = "You were " + Math.abs(settings.getTargetVal() - points);
                 postGame("YOU LOST! " + pointsStr + " point/s away from target number.");
             } else if (updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols()) == settings.getTargetVal()) {
                 postGame("YOU WIN!");
             }
         }
-        movesLeftLabel.setText("Moves left: " + buttons[0][0].dblToFStr(movesLeft));
+        movesLeftLabel.setText("Moves left: " + movesLeft);
+        frame.revalidate();
     }
 
 
     public void postGame(String labelText) {
         frame.remove(gamePanel);
-
         JPanel postGamePanel = new JPanel(new BorderLayout());
         JPanel whatsNextButtons = new JPanel(new GridLayout(1, 2));
 
         JLabel postGameLabel = new JLabel(labelText);
         postGameLabel.setHorizontalAlignment(JLabel.CENTER);
+        postGameLabel.setBorder(
+                BorderFactory.createEmptyBorder(30, 20, 30, 20)
+        );
         postGamePanel.add(postGameLabel);
 
         JButton changeSettingsButton = new JButton("Main menu...");
@@ -375,5 +346,6 @@ public class GameGui {
         whatsNextButtons.add(changeSettingsButton);
         postGamePanel.add(whatsNextButtons, BorderLayout.SOUTH);
         frame.add(postGamePanel);
+        frame.pack();
     }
 }

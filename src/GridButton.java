@@ -2,7 +2,7 @@ import javax.swing.*;
 
 public class GridButton extends JButton {
     private final int row, col;
-    private double value;
+    private int value;
 
     GridButton(int randomNumber, int row, int col) {
         super(randomNumber + "");
@@ -19,20 +19,12 @@ public class GridButton extends JButton {
         return col;
     }
 
-    public double getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(int value) {
         this.value = value;
-        this.setText(dblToFStr(value));
-    }
-
-    public String dblToFStr(double in) {
-        String strValue = in + "";
-        if (strValue.endsWith(".0")) {
-            strValue = strValue.replace(".0", "");
-        }
-        return strValue;
+        this.setText(value + "");
     }
 }
