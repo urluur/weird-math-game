@@ -265,10 +265,27 @@ public class GameGui {
     }
 
     public void updateOperators() {
-        for (int i = 0; i < operatorsLabels.length - 1; i++) {
-            operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
+        for (int i = 0; i < operatorsLabels.length; i++) {
+            if (movesLeft <= operatorsLabels.length) {
+                if (i < movesLeft - 2) {
+                    operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
+                } else if (i < movesLeft - 1) {
+                    if (i + 1 == operatorsLabels.length) {
+                        operatorsLabels[i].setText(getRandOperator());
+                    } else {
+                        operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
+                    }
+                } else {
+                    operatorsLabels[i].setText("");
+                }
+            } else {
+                if (i < operatorsLabels.length - 1) {
+                    operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
+                } else {
+                    operatorsLabels[i].setText(getRandOperator());
+                }
+            }
         }
-        operatorsLabels[operatorsLabels.length - 1].setText(getRandOperator());
     }
 
     public String getRandOperator() {
@@ -349,6 +366,7 @@ public class GameGui {
     }
 
     public void createAvailableButtonsCross(int maxRow, int maxCol) {
+        int numOfAvailableButtons = 0;
         for (int i = 0; i < maxRow; i++) {
             for (int j = 0; j < maxCol; j++) {
                 if ((selectedButtonRow == i && selectedButtonCol == j) ||
@@ -357,8 +375,15 @@ public class GameGui {
                     buttons[i][j].setEnabled(false);
                 } else {
                     buttons[i][j].setEnabled(selectedButtonRow == i || selectedButtonCol == j);
+                    if (buttons[i][j].isEnabled()) {
+                        numOfAvailableButtons++;
+                    }
                 }
             }
+        }
+        if (numOfAvailableButtons == 0) { // instant game over if player can't press any buttons
+            movesLeft = 0;
+            moveDone();
         }
     }
 
