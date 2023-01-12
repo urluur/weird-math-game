@@ -1,6 +1,5 @@
 public class Settings {
-    private int numOfRows = 7, numOfCols = 5, movesLeft = 5;
-    private int targetValue = 150;
+    private int numOfRows = 7, numOfCols = 5, movesLeft = 5, targetValue = 150;
 
     public int getNumOfRows() {
         return numOfRows;
@@ -32,5 +31,9 @@ public class Settings {
 
     public void setTargetValue(int targetValue) {
         this.targetValue = targetValue;
+    }
+
+    public String fileFriendlyString() {
+        return numOfRows + "|" + numOfCols + "|" + movesLeft + "|" + targetValue;
     }
 }

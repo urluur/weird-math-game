@@ -1,6 +1,9 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.Random;
 
 public class GameGui {
@@ -80,7 +83,7 @@ public class GameGui {
         value = new SpinnerNumberModel(
                 settings.getTargetVal(), // default value
                 1, // minimum target value
-                300, // maximum target value
+                420, // maximum target value
                 1 // spinner step
         );
         targetSpinner = new JSpinner(value);
@@ -114,10 +117,8 @@ public class GameGui {
             init();
         });
         JButton loadFileButton = new JButton("Load from file...");
-        loadFileButton.addActionListener(e -> {
-            // TODO: add function for loading from file
-        });
-        loadFileButton.setEnabled(false);
+        loadFileButton.addActionListener(e -> load(mainMenuPanel));
+        loadFileButton.setEnabled(readFromFilePossible());
 
         JButton easyPresetButton = new JButton("Easy");
         easyPresetButton.addActionListener(e -> setSpinnersTo(3, 3, 50, 20));
@@ -159,10 +160,26 @@ public class GameGui {
         frame.revalidate();
     }
 
-    public void init(){
+    public void init() {
+        init(null, -1, null, null);
+    }
+
+    public void init(String[] newSettings, int newMovesLeft, String[] newButtons, String[] newOperators){
+        if (newMovesLeft == -1) {
+            movesLeft = settings.getMovesLeft();
+        } else {
+            movesLeft = newMovesLeft;
+        }
+
+        if (newSettings != null) {
+            settings.setNumOfRows(Integer.parseInt(newSettings[0]));
+            settings.setNumOfCols(Integer.parseInt(newSettings[1]));
+            settings.setMovesLeft(Integer.parseInt(newSettings[2]));
+            settings.setTargetValue(Integer.parseInt(newSettings[3]));
+        }
+
         selectedButtonRow = -1;
         selectedButtonCol = -1;
-        movesLeft = settings.getMovesLeft();
         frame.setResizable(true);
 
         gamePanel = new JPanel(new BorderLayout());
@@ -172,27 +189,21 @@ public class GameGui {
         buttonsPanel.setBorder(defaultBorder);
         buttonsPanel.setLayout(new GridLayout(settings.getNumOfRows(), settings.getNumOfCols()));
 
-
         // top panel
         JPanel topPanel = new JPanel(new GridLayout(0, 3));
         topPanel.setBorder(defaultBorder);
 
-        changeButtonGridSize(settings.getNumOfRows(), settings.getNumOfCols());
+        changeButtonGridSize(settings.getNumOfRows(), settings.getNumOfCols(), newButtons);
 
         // next operators panel
         nextOperatorsPanel = new JPanel(new GridLayout(settings.getNumOfRows(), 1));
         nextOperatorsPanel.setBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 15)
         );
-        setupNextOperators();
+        setupNextOperators(newOperators);
 
         JButton saveButton = new JButton("Save & Quit");
-        saveButton.addActionListener(e -> {
-            // TODO: create function for saving
-            System.out.println("saved");
-            System.out.println("i swear");
-        });
-        saveButton.setEnabled(false);
+        saveButton.addActionListener(e -> save());
         topPanel.add(saveButton);
 
         targetValueLabel = new JLabel("Target value:");
@@ -223,9 +234,9 @@ public class GameGui {
         frame.revalidate();
     }
 
-    public void changeButtonGridSize(int x, int y) {
+    public void changeButtonGridSize(int x, int y, String[] newButtons) {
         buttons = new GridButton[x][y];
-        addButtons(x, y);
+        addButtons(x, y, newButtons);
     }
 
     public void setSpinnersTo(int rows, int cols, int target, int moves) {
@@ -235,21 +246,33 @@ public class GameGui {
         moveSpinner.setValue(moves);
     }
 
-    public void addButtons(int x, int y) {
+    public void addButtons(int x, int y, String[] newButtons) {
         Random rand = new Random();
+        int newButtonCount = 0;
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
-                buttons[i][j] = new GridButton(rand.nextInt(9), i, j);
+                if (newButtons != null) {
+                    buttons[i][j] = new GridButton(Integer.parseInt(newButtons[newButtonCount]), i, j);
+                    newButtonCount++;
+                } else {
+                    buttons[i][j] = new GridButton(rand.nextInt(9), i, j);
+                }
                 buttonsPanel.add(buttons[i][j]);
             }
         }
         addButtonActionListeners(x, y);
     }
     
-    public void setupNextOperators() {
+    public void setupNextOperators(String[] newOperators) {
+        int newOperatorsCount = 0;
         operatorsLabels = new JLabel[settings.getNumOfRows()];
         for (int i = 0; i < settings.getNumOfRows(); i++) {
-            operatorsLabels[i] = new JLabel(getRandOperator());
+            if (newOperators != null && i < newOperators.length) {
+                operatorsLabels[i] = new JLabel(newOperators[newOperatorsCount]);
+                newOperatorsCount++;
+            } else {
+                operatorsLabels[i] = new JLabel(getRandOperator());
+            }
             if(i < movesLeft) {
                 if (i == 0) {
                     operatorsLabels[i].setFont(new Font("Arial", Font.BOLD, 22));
@@ -411,11 +434,38 @@ public class GameGui {
         JPanel whatsNextButtons = new JPanel(new GridLayout(1, 2));
 
         JLabel postGameLabel = new JLabel(labelText);
+        postGameLabel.setOpaque(true);
+
+
+        // source: https://stackoverflow.com/questions/299495/how-to-add-an-image-to-a-jpanel
+        BufferedImage myPicture;
+        JLabel picLabel;
+        if (labelText.startsWith("YOU LOST!")) {
+            try {
+                myPicture = ImageIO.read(new File("src/betaLoser.jpg"));
+                picLabel = new JLabel(new ImageIcon(myPicture));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            postGameLabel.setBackground(Color.RED);
+        } else {
+            try {
+                myPicture = ImageIO.read(new File("src/sigmaSwagWinner.jpg"));
+                picLabel = new JLabel(new ImageIcon(myPicture));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            postGameLabel.setBackground(Color.WHITE);
+
+        }
+        postGamePanel.add(picLabel, BorderLayout.CENTER);
+
+
         postGameLabel.setHorizontalAlignment(JLabel.CENTER);
         postGameLabel.setBorder(
                 BorderFactory.createEmptyBorder(30, 20, 30, 20)
         );
-        postGamePanel.add(postGameLabel);
+        postGamePanel.add(postGameLabel, BorderLayout.NORTH);
 
         JButton changeSettingsButton = new JButton("Main menu...");
         changeSettingsButton.addActionListener(e -> {
@@ -432,5 +482,148 @@ public class GameGui {
         postGamePanel.add(whatsNextButtons, BorderLayout.SOUTH);
         frame.add(postGamePanel);
         frame.pack();
+    }
+
+    public void save() {
+        File file = new File("src/saveData.txt");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+
+            writer.write("Settings");
+            writer.newLine();
+            writer.write(settings.fileFriendlyString());
+            writer.newLine();
+
+            writer.write("Moves left");
+            writer.newLine();
+            writer.write(movesLeft + "");
+            writer.newLine();
+
+            writer.write("Buttons");
+            writer.newLine();
+            writer.write(fileFriendlyButtons());
+            writer.newLine();
+
+            writer.write("Next operators");
+            writer.newLine();
+            writer.write(fileFriendlyOperators());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        frame.dispose(); // closes the window and ends program
+    }
+
+    public void load(JPanel mainMenuPanel) {
+        String [] newSettings;
+        int newMovesLeft;
+        String [] newButtons;
+        String [] newOperators;
+
+        File file = new File("src/saveData.txt");
+        try (BufferedReader reader = new BufferedReader((new FileReader(file)))) {
+            String line = reader.readLine();
+            if (!line.equals("Settings")) {
+                throw new Exception("Wrong file!");
+            } else {
+                line = reader.readLine();
+                newSettings = line.split("\\|");
+            }
+
+            line = reader.readLine();
+            if (!line.equals("Moves left")) {
+                throw new Exception("Wrong file!");
+            } else {
+                line = reader.readLine();
+                newMovesLeft = Integer.parseInt(line);
+            }
+
+            line = reader.readLine();
+            if (!line.equals("Buttons")) {
+                throw new Exception("Wrong file!");
+            } else {
+                line = reader.readLine();
+                newButtons = line.split("\\|");
+            }
+
+            line = reader.readLine();
+            if (!line.equals("Next operators")) {
+                throw new Exception("Wrong file!");
+            } else {
+                line = reader.readLine();
+                newOperators = line.split("\\|");
+            }
+            frame.remove(mainMenuPanel);
+            init(newSettings, newMovesLeft, newButtons, newOperators);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public String fileFriendlyButtons() {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < settings.getNumOfRows(); i++) {
+            for (int j = 0; j < settings.getNumOfCols(); j++) {
+                str.append(buttons[i][j].getValue());
+                if (
+                    i + 1 != settings.getNumOfRows() ||
+                    j + 1 != settings.getNumOfCols()
+                ) {
+                    str.append("|");
+                }
+            }
+        }
+        return str.toString();
+    }
+
+    public String fileFriendlyOperators() {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < operatorsLabels.length; i++) {
+            if (i == movesLeft) {
+                break;
+            }
+            str.append(operatorsLabels[i].getText());
+            if(i + 1 != operatorsLabels.length && i + 1 != movesLeft) {
+                str.append("|");
+            }
+        }
+        return str.toString();
+    }
+
+    public boolean readFromFilePossible() {
+        File file = new File("src/saveData.txt");
+        try (BufferedReader reader = new BufferedReader((new FileReader(file)))) {
+            String line = reader.readLine();
+            if (!line.equals("Settings")) {
+                throw new Exception("Wrong file!");
+            } else {
+                reader.readLine();
+            }
+
+            line = reader.readLine();
+            if (!line.equals("Moves left")) {
+                throw new Exception("Wrong file!");
+            } else {
+                reader.readLine();
+            }
+
+            line = reader.readLine();
+            if (!line.equals("Buttons")) {
+                throw new Exception("Wrong file!");
+            } else {
+                reader.readLine();
+            }
+
+            line = reader.readLine();
+            if (!line.equals("Next operators")) {
+                throw new Exception("Wrong file!");
+            } else {
+                reader.readLine();
+            }
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
