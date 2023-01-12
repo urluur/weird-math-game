@@ -5,9 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5106c5e6-e730-4ad6-9067-c275ef34aa9a" name="Changes" comment="menu and spinners">
-      <change afterPath="$PROJECT_DIR$/src/betaLoser.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/saveData.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/sigmaSwagWinner.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameGui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameGui.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Settings.java" afterDir="false" />
@@ -151,6 +148,11 @@
       <workItem from="1673425566788" duration="4107000" />
       <workItem from="1673508113206" duration="9747000" />
       <workItem from="1673519155864" duration="15000" />
+      <workItem from="1673521888049" duration="544000" />
+      <workItem from="1673533755508" duration="2947000" />
+      <workItem from="1673542489892" duration="12824000" />
+      <workItem from="1673559329239" duration="2000" />
+      <workItem from="1673559334936" duration="214000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed layout">
       <created>1672337686887</created>
@@ -187,5 +189,16 @@
     <MESSAGE value="Fixed layout" />
     <MESSAGE value="menu and spinners" />
     <option name="LAST_COMMIT_MESSAGE" value="menu and spinners" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/GameGui.java</url>
+          <line>564</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -1,7 +1,7 @@
 public class Settings {
     private int numOfRows = 7, numOfCols = 5, movesLeft = 5, targetValue = 150;
 
-    public int getNumOfRows() {
+    public int getRows() {
         return numOfRows;
     }
 
@@ -9,7 +9,7 @@ public class Settings {
         this.numOfRows = numOfRows;
     }
 
-    public int getNumOfCols() {
+    public int getCols() {
         return numOfCols;
     }
 

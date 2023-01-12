@@ -22,10 +22,18 @@ public class GameGui {
         mainMenu();
     }
 
+    /**
+     * Sets up main menu with default settings defined in Settings.java
+     */
     public void mainMenu() {
         mainMenu(new Settings());
     }
 
+    /**
+     * Sets up main menu with with settings defined in argument object
+     * Used when going to main menu after already finishing the game to keep previous settings
+     * @param settings Settings object from which settings on spinners will be set
+     */
     public void mainMenu(Settings settings) {
         this.settings = settings;
 
@@ -33,7 +41,7 @@ public class GameGui {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("More or less, less is more!");
         frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
+        // frame.setLocationRelativeTo(null); // opens window in the center of the screen
 
         JPanel mainMenuPanel = new JPanel(new BorderLayout());
         JPanel settingsPanel = new JPanel(new GridLayout(2, 1));
@@ -55,7 +63,7 @@ public class GameGui {
         JLabel rowsLabel = new JLabel("Rows: ");
         rowsLabel.setHorizontalAlignment(JLabel.RIGHT);
         SpinnerModel value = new SpinnerNumberModel(
-                settings.getNumOfRows(), // default value
+                settings.getRows(), // default value
                 2, // minimum number of rows
                 10, // maximum number of rows
                 1 // spinner step
@@ -68,7 +76,7 @@ public class GameGui {
         JLabel colsLabel = new JLabel("Columns: ");
         colsLabel.setHorizontalAlignment(JLabel.RIGHT);
         value = new SpinnerNumberModel(
-                settings.getNumOfCols(), // default value
+                settings.getCols(), // default value
                 2, // minimum number of columns
                 10, // maximum number of columns
                 1 // spinner step
@@ -104,7 +112,6 @@ public class GameGui {
         labelAndSpinnerPanels[3].add(moveSpinner);
         // that's it for spinners
 
-
         // start game buttons
         JPanel startGamePanel = new JPanel(new GridLayout(1, 2));
         JButton startNewGameButton = new JButton("Start new game!");
@@ -117,17 +124,20 @@ public class GameGui {
             init();
         });
         JButton loadFileButton = new JButton("Load from file...");
-        loadFileButton.addActionListener(e -> load(mainMenuPanel));
+        loadFileButton.addActionListener(e -> {
+            frame.remove(mainMenuPanel);
+            load();
+        });
         loadFileButton.setEnabled(readFromFilePossible());
 
         JButton easyPresetButton = new JButton("Easy");
-        easyPresetButton.addActionListener(e -> setSpinnersTo(3, 3, 50, 20));
+        easyPresetButton.addActionListener(e -> setSpinnersTo(5, 5, 111, 60));
 
         JButton mediumPresetButton = new JButton("Medium");
-        mediumPresetButton.addActionListener(e -> setSpinnersTo(5, 5, 150, 15));
+        mediumPresetButton.addActionListener(e -> setSpinnersTo(6, 6, 150, 50));
 
         JButton hardPresetButton = new JButton("Hard");
-        hardPresetButton.addActionListener(e -> setSpinnersTo(7, 7, 300, 10));
+        hardPresetButton.addActionListener(e -> setSpinnersTo(7, 7, 222, 30));
 
         JLabel presetsLabel = new JLabel("Presets:");
         presetsLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -160,10 +170,21 @@ public class GameGui {
         frame.revalidate();
     }
 
+    /**
+     * Sets up game
+     * Called when not reading from a file
+     */
     public void init() {
         init(null, -1, null, null);
     }
 
+    /**
+     * Sets up game with state read from a file or arguments (null, -1, null, null) for new game
+     * @param newSettings settings obtained from file; must be in order: rows, cols, movesLeft, targetValue
+     * @param newMovesLeft moves left when player saved to file
+     * @param newButtons buttons on the grid when player saved to file
+     * @param newOperators operators in queue when player saved to file
+     */
     public void init(String[] newSettings, int newMovesLeft, String[] newButtons, String[] newOperators){
         if (newMovesLeft == -1) {
             movesLeft = settings.getMovesLeft();
@@ -187,16 +208,16 @@ public class GameGui {
         // panel
         buttonsPanel = new JPanel();
         buttonsPanel.setBorder(defaultBorder);
-        buttonsPanel.setLayout(new GridLayout(settings.getNumOfRows(), settings.getNumOfCols()));
+        buttonsPanel.setLayout(new GridLayout(settings.getRows(), settings.getCols()));
 
         // top panel
         JPanel topPanel = new JPanel(new GridLayout(0, 3));
         topPanel.setBorder(defaultBorder);
 
-        changeButtonGridSize(settings.getNumOfRows(), settings.getNumOfCols(), newButtons);
+        createButtonGrid(newButtons);
 
         // next operators panel
-        nextOperatorsPanel = new JPanel(new GridLayout(settings.getNumOfRows(), 1));
+        nextOperatorsPanel = new JPanel(new GridLayout(settings.getRows(), 1));
         nextOperatorsPanel.setBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 15)
         );
@@ -220,37 +241,30 @@ public class GameGui {
         movesLeftLabel.setHorizontalAlignment(JLabel.RIGHT);
         topPanel.add(movesLeftLabel, BorderLayout.EAST);
 
-
         gamePanel.add(topPanel, BorderLayout.NORTH);
         gamePanel.add(buttonsPanel, BorderLayout.CENTER);
         gamePanel.add(nextOperatorsPanel, BorderLayout.EAST);
         frame.add(gamePanel);
-        frame.pack();
-        frame.setVisible(true);
 
         printTargetValue();
-        updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols());
+        updateCurrentSum(settings.getRows(), settings.getCols());
         moveDone(true);
         frame.revalidate();
+
+        frame.pack();
+        frame.setVisible(true);
     }
 
-    public void changeButtonGridSize(int x, int y, String[] newButtons) {
-        buttons = new GridButton[x][y];
-        addButtons(x, y, newButtons);
-    }
-
-    public void setSpinnersTo(int rows, int cols, int target, int moves) {
-        rowSpinner.setValue(rows);
-        colSpinner.setValue(cols);
-        targetSpinner.setValue(target);
-        moveSpinner.setValue(moves);
-    }
-
-    public void addButtons(int x, int y, String[] newButtons) {
+    /**
+     * Generates a grid of buttons with random values
+     * @param newButtons null to generate new random values or operators read from file
+     */
+    public void createButtonGrid(String[] newButtons) {
+        buttons = new GridButton[settings.getRows()][settings.getCols()];
         Random rand = new Random();
         int newButtonCount = 0;
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
+        for (int i = 0; i < settings.getRows(); i++) {
+            for (int j = 0; j < settings.getCols(); j++) {
                 if (newButtons != null) {
                     buttons[i][j] = new GridButton(Integer.parseInt(newButtons[newButtonCount]), i, j);
                     newButtonCount++;
@@ -260,13 +274,32 @@ public class GameGui {
                 buttonsPanel.add(buttons[i][j]);
             }
         }
-        addButtonActionListeners(x, y);
+        addButtonActionListeners();
     }
-    
+
+    /**
+     * Sets spinners to determined values
+     * @param rows number shown on rows spinner
+     * @param cols number shown on columns spinner
+     * @param target number shown on target number spinner
+     * @param moves number shown on spinner moves left spinner
+     */
+    public void setSpinnersTo(int rows, int cols, int target, int moves) {
+        rowSpinner.setValue(rows);
+        colSpinner.setValue(cols);
+        targetSpinner.setValue(target);
+        moveSpinner.setValue(moves);
+    }
+
+    /**
+     * Creates labels on the right of the screen
+     * Only called when starting a game or loading a game
+     * @param newOperators null for random operators or data read from file
+     */
     public void setupNextOperators(String[] newOperators) {
         int newOperatorsCount = 0;
-        operatorsLabels = new JLabel[settings.getNumOfRows()];
-        for (int i = 0; i < settings.getNumOfRows(); i++) {
+        operatorsLabels = new JLabel[settings.getRows()];
+        for (int i = 0; i < settings.getRows(); i++) {
             if (newOperators != null && i < newOperators.length) {
                 operatorsLabels[i] = new JLabel(newOperators[newOperatorsCount]);
                 newOperatorsCount++;
@@ -287,21 +320,24 @@ public class GameGui {
         }
     }
 
+    /**
+     * Moves the operators up in queue after each move
+     */
     public void updateOperators() {
-        for (int i = 0; i < operatorsLabels.length; i++) {
-            if (movesLeft <= operatorsLabels.length) {
-                if (i < movesLeft - 2) {
+        for (int i = 0; i < operatorsLabels.length; i++) { // goes trough all labels
+            if (movesLeft <= operatorsLabels.length) { // there are less operators in queue than all labels
+                if (i < movesLeft - 2) { // labels that will get text from next label
                     operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
                 } else if (i < movesLeft - 1) {
-                    if (i + 1 == operatorsLabels.length) {
+                    if (i == operatorsLabels.length - 1) { // can't access out of array
                         operatorsLabels[i].setText(getRandOperator());
                     } else {
                         operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
                     }
-                } else {
+                } else { // when there are less operators in queue than all labels
                     operatorsLabels[i].setText("");
                 }
-            } else {
+            } else { // there are more operators in queue than labels
                 if (i < operatorsLabels.length - 1) {
                     operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
                 } else {
@@ -311,6 +347,10 @@ public class GameGui {
         }
     }
 
+    /**
+     * Returns a random operator
+     * @return a string with one of the following operators: + - * /
+     */
     public String getRandOperator() {
         Random random = new Random();
         switch (random.nextInt(4)) {
@@ -333,13 +373,22 @@ public class GameGui {
         }
     }
 
+    /**
+     * Sets the label text for target value
+     */
     public void printTargetValue() {
         this.targetValueLabel.setText("Target value: " + settings.getTargetVal());
     }
 
+    /**
+     * Counts all numbers on the buttons on the grid
+     * Updates the current sum label
+     * @param rows number of rows of the button grid
+     * @param cols number of columns of the button grid
+     * @return sum of all numbers on the buttons
+     */
     public int updateCurrentSum(int rows, int cols) {
         int sum = 0;
-
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 sum = sum + buttons[i][j].getValue();
@@ -349,25 +398,32 @@ public class GameGui {
         return sum;
     }
 
-    public void addButtonActionListeners(int maxRow, int maxCol) {
-        for (int i = 0; i < maxRow; i++) {
-            for (int j = 0; j < maxCol; j++) {
-                addButtonActionListener(i, j, maxRow, maxCol);
+    /**
+     * Adds action listeners to all buttons
+     */
+    public void addButtonActionListeners() {
+        for (int i = 0; i < settings.getRows(); i++) {
+            for (int j = 0; j < settings.getCols(); j++) {
+                addButtonActionListener(i, j);
             }
         }
     }
 
-    public void addButtonActionListener(int currentX, int currentY, int maxRow, int maxCol) {
-        buttons[currentX][currentY].addActionListener(e -> {
-            if (selectedButtonRow == -1 && selectedButtonCol == -1) { // when first click
-                selectedButtonRow = buttons[currentX][currentY].getRow();
-                selectedButtonCol = buttons[currentX][currentY].getCol();
-                createAvailableButtonsCross(maxRow, maxCol);
-            }
-            else { // all other buttons clicked after first one
+    /**
+     * Adds action listener to a button
+     * @param currentRow current button's row
+     * @param currentCol current button's column
+     */
+    public void addButtonActionListener(int currentRow, int currentCol) {
+        buttons[currentRow][currentCol].addActionListener(e -> {
+            if (selectedButtonRow == -1 && selectedButtonCol == -1) { // on first button click
+                selectedButtonRow = buttons[currentRow][currentCol].getRow();
+                selectedButtonCol = buttons[currentRow][currentCol].getCol();
+                createAvailableButtonsCross();
+            } else { // all other buttons clicked after first one
                 int result = 0;
                 int arg1 = buttons[selectedButtonRow][selectedButtonCol].getValue();
-                int arg2 = buttons[currentX][currentY].getValue();
+                int arg2 = buttons[currentRow][currentCol].getValue();
                 switch (operatorsLabels[0].getText()) {
                     case "+" -> result = arg1 + arg2;
                     case "-" -> result = arg1 - arg2;
@@ -379,19 +435,23 @@ public class GameGui {
                 if (selectedButtonRow != -1) {
                     updateOperators();
                 }
-                selectedButtonRow = buttons[currentX][currentY].getRow();
-                selectedButtonCol = buttons[currentX][currentY].getCol();
-                createAvailableButtonsCross(maxRow, maxCol);
-                updateCurrentSum(maxRow, maxCol);
+                selectedButtonRow = buttons[currentRow][currentCol].getRow();
+                selectedButtonCol = buttons[currentRow][currentCol].getCol();
+                createAvailableButtonsCross();
+                updateCurrentSum(settings.getRows(), settings.getCols());
                 moveDone(); // subtracts 1 from movesLeft and updates label
             }
         });
     }
 
-    public void createAvailableButtonsCross(int maxRow, int maxCol) {
+    /**
+     * Disables numbers that aren't in the same row or column as selected button
+     * Also disables all buttons with number 0 if current operator is /
+     */
+    public void createAvailableButtonsCross() {
         int numOfAvailableButtons = 0;
-        for (int i = 0; i < maxRow; i++) {
-            for (int j = 0; j < maxCol; j++) {
+        for (int i = 0; i < settings.getRows(); i++) {
+            for (int j = 0; j < settings.getCols(); j++) {
                 if ((selectedButtonRow == i && selectedButtonCol == j) ||
                     (operatorsLabels[0].getText().equals("/") && buttons[i][j].getText().equals("0"))
                 ) {
@@ -410,24 +470,36 @@ public class GameGui {
         }
     }
 
+    /**
+     * Call when player plays their move
+     */
     public void moveDone() {
         moveDone(false);
     }
 
+    /**
+     * Decrements movesLeft, updates currentSum, and checks win/lose
+     * @param init true when initializing the game, false when playing normally
+     */
     public void moveDone(boolean init) {
         if (!init) {
             movesLeft--;
-            int points = updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols());
+            int points = updateCurrentSum(settings.getRows(), settings.getCols());
             if (movesLeft <= 0 && points != settings.getTargetVal()) {
-                String pointsStr = "You were " + Math.abs(settings.getTargetVal() - points);
-                postGame("YOU LOST! " + pointsStr + " point/s away from target number.");
-            } else if (updateCurrentSum(settings.getNumOfRows(), settings.getNumOfCols()) == settings.getTargetVal()) {
+                String pointsStr = "YOU WERE " + Math.abs(settings.getTargetVal() - points);
+                postGame("YOU LOST! " + pointsStr + " POINT/S AWAY FROM TARGET NUMBER!");
+            } else if (updateCurrentSum(settings.getRows(), settings.getCols()) == settings.getTargetVal()) {
                 postGame("YOU WIN!");
             }
         }
         movesLeftLabel.setText("Moves left: " + movesLeft);
         frame.revalidate();
     }
+
+    /**
+     * Creates win or lose post-game screen
+     * @param labelText text displayed to user
+     */
     public void postGame(String labelText) {
         frame.remove(gamePanel);
         JPanel postGamePanel = new JPanel(new BorderLayout());
@@ -436,11 +508,13 @@ public class GameGui {
         JLabel postGameLabel = new JLabel(labelText);
         postGameLabel.setOpaque(true);
 
-
+        // win or lose picture
         // source: https://stackoverflow.com/questions/299495/how-to-add-an-image-to-a-jpanel
         BufferedImage myPicture;
         JLabel picLabel;
-        if (labelText.startsWith("YOU LOST!")) {
+        postGameLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        if (labelText.startsWith("YOU LOST!")) { // loser screen
+            postGameLabel.setForeground(Color.WHITE);
             try {
                 myPicture = ImageIO.read(new File("src/betaLoser.jpg"));
                 picLabel = new JLabel(new ImageIcon(myPicture));
@@ -448,7 +522,7 @@ public class GameGui {
                 throw new RuntimeException(e);
             }
             postGameLabel.setBackground(Color.RED);
-        } else {
+        } else { // winner screen
             try {
                 myPicture = ImageIO.read(new File("src/sigmaSwagWinner.jpg"));
                 picLabel = new JLabel(new ImageIcon(myPicture));
@@ -460,7 +534,6 @@ public class GameGui {
         }
         postGamePanel.add(picLabel, BorderLayout.CENTER);
 
-
         postGameLabel.setHorizontalAlignment(JLabel.CENTER);
         postGameLabel.setBorder(
                 BorderFactory.createEmptyBorder(30, 20, 30, 20)
@@ -470,7 +543,7 @@ public class GameGui {
         JButton changeSettingsButton = new JButton("Main menu...");
         changeSettingsButton.addActionListener(e -> {
             frame.remove(postGamePanel);
-            mainMenu(settings);
+            mainMenu(settings); // keeps current settings
         });
         JButton playAgainButton = new JButton("Play again!");
         playAgainButton.addActionListener(e -> {
@@ -482,8 +555,12 @@ public class GameGui {
         postGamePanel.add(whatsNextButtons, BorderLayout.SOUTH);
         frame.add(postGamePanel);
         frame.pack();
+        frame.setResizable(false);
     }
 
+    /**
+     * Saves the current state of the game to a file
+     */
     public void save() {
         File file = new File("src/saveData.txt");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -514,7 +591,10 @@ public class GameGui {
         frame.dispose(); // closes the window and ends program
     }
 
-    public void load(JPanel mainMenuPanel) {
+    /**
+     * Loads previous game state from file
+     */
+    public void load() {
         String [] newSettings;
         int newMovesLeft;
         String [] newButtons;
@@ -553,22 +633,24 @@ public class GameGui {
                 line = reader.readLine();
                 newOperators = line.split("\\|");
             }
-            frame.remove(mainMenuPanel);
             init(newSettings, newMovesLeft, newButtons, newOperators);
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
+    /**
+     * Generates a string with values of all buttons ready to write to file
+     * @return string with all values seperated with pipe character |
+     */
     public String fileFriendlyButtons() {
         StringBuilder str = new StringBuilder();
-        for (int i = 0; i < settings.getNumOfRows(); i++) {
-            for (int j = 0; j < settings.getNumOfCols(); j++) {
+        for (int i = 0; i < settings.getRows(); i++) {
+            for (int j = 0; j < settings.getCols(); j++) {
                 str.append(buttons[i][j].getValue());
                 if (
-                    i + 1 != settings.getNumOfRows() ||
-                    j + 1 != settings.getNumOfCols()
+                    i + 1 != settings.getRows() ||
+                    j + 1 != settings.getCols()
                 ) {
                     str.append("|");
                 }
@@ -577,6 +659,10 @@ public class GameGui {
         return str.toString();
     }
 
+    /**
+     * Generates a string with all operators in queue ready to write to file
+     * @return string with all operators seperated with pipe character |
+     */
     public String fileFriendlyOperators() {
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < operatorsLabels.length; i++) {
@@ -591,6 +677,10 @@ public class GameGui {
         return str.toString();
     }
 
+    /**
+     * Checks if file has valid information for reading
+     * @return true if file is possible to read from
+     */
     public boolean readFromFilePossible() {
         File file = new File("src/saveData.txt");
         try (BufferedReader reader = new BufferedReader((new FileReader(file)))) {
