@@ -45,7 +45,7 @@ public class GameGui {
     }
 
     /**
-     * Sets up main menu with with settings defined in argument object
+     * Sets up main menu with settings defined in argument object
      * Used when going to main menu after already finishing the game to keep previous settings
      * @param settings Settings object from which settings on spinners will be set
      */
@@ -345,7 +345,7 @@ public class GameGui {
      */
     public void updateOperators() {
         for (int i = 0; i < operatorsLabels.length; i++) { // goes trough all labels
-            if (movesLeft <= operatorsLabels.length) { // there are less operators in queue than all labels
+            if (movesLeft <= operatorsLabels.length) { // there are fewer operators in queue than all labels
                 if (i < movesLeft - 2) { // labels that will get text from next label
                     operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
                 } else if (i < movesLeft - 1) {
@@ -354,7 +354,7 @@ public class GameGui {
                     } else {
                         operatorsLabels[i].setText(operatorsLabels[i + 1].getText());
                     }
-                } else { // when there are less operators in queue than all labels
+                } else { // when there are fewer operators in queue than all labels
                     operatorsLabels[i].setText("");
                 }
             } else { // there are more operators in queue than labels
@@ -674,7 +674,7 @@ public class GameGui {
 
     /**
      * Generates a string with values of all buttons ready to write to file
-     * @return string with all values seperated with pipe character |
+     * @return string with all values separated with pipe character |
      */
     public String fileFriendlyButtons() {
         StringBuilder str = new StringBuilder();
@@ -694,7 +694,7 @@ public class GameGui {
 
     /**
      * Generates a string with all operators in queue ready to write to file
-     * @return string with all operators seperated with pipe character |
+     * @return string with all operators separated with pipe character |
      */
     public String fileFriendlyOperators() {
         StringBuilder str = new StringBuilder();
