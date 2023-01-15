@@ -1,5 +1,5 @@
 public class Settings {
-    private int numOfRows = 7, numOfCols = 5, movesLeft = 5, targetValue = 150;
+    private int numOfRows = 7, numOfCols = 5, movesLeft = 20, targetValue = 150;
 
     public int getRows() {
         return numOfRows;
