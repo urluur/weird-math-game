@@ -7,9 +7,6 @@
     <list default="true" id="5106c5e6-e730-4ad6-9067-c275ef34aa9a" name="Changes" comment="menu and spinners">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameGui.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameGui.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Settings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/betaLoser.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/loser.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sigmaSwagWinner.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/winner.jpg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,7 +204,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/GameGui.java</url>
-          <line>594</line>
+          <line>597</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>

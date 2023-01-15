@@ -246,6 +246,9 @@ public class GameGui {
 
         targetValueLabel = new JLabel("Target value:");
         targetValueLabel.setHorizontalAlignment(JLabel.CENTER);
+        targetValueLabel.setBorder(
+                BorderFactory.createEmptyBorder(0, 10, 0, 10)
+        );
         topPanel.add(targetValueLabel, BorderLayout.CENTER);
 
         currentSumLabel = new JLabel("Current sum:");
