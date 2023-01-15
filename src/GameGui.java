@@ -28,7 +28,6 @@ public class GameGui {
                     UIManager.put("nimbusBlueGrey", Color.lightGray); //buttons
                     UIManager.put("control", Color.lightGray); // background
 
-
                     UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -155,7 +154,7 @@ public class GameGui {
         JButton hardPresetButton = new JButton("Hard");
         hardPresetButton.addActionListener(e -> setSpinnersTo(7, 7, 222, 30));
 
-        JLabel presetsLabel = new JLabel("Presets:");
+        JLabel presetsLabel = new JLabel("Preset:");
         presetsLabel.setHorizontalAlignment(JLabel.CENTER);
         difficultyPresetsPanel.add(presetsLabel);
         difficultyPresetsPanel.add(easyPresetButton);
@@ -239,9 +238,11 @@ public class GameGui {
         );
         setupNextOperators(newOperators);
 
+        JPanel savePanel = new JPanel(new BorderLayout());
         JButton saveButton = new JButton("Save & Quit");
         saveButton.addActionListener(e -> save());
-        topPanel.add(saveButton);
+        savePanel.add(saveButton, BorderLayout.WEST);
+        topPanel.add(savePanel);
 
         targetValueLabel = new JLabel("Target value:");
         targetValueLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -529,26 +530,39 @@ public class GameGui {
         BufferedImage myPicture;
         JLabel picLabel;
         postGameLabel.setFont(new Font("Arial", Font.BOLD, 18));
+
         if (labelText.startsWith("YOU LOST!")) { // loser screen
             postGameLabel.setForeground(Color.WHITE);
             try {
-                myPicture = ImageIO.read(new File("src/betaLoser.jpg"));
+                myPicture = ImageIO.read(new File("src/loser.jpg"));
                 picLabel = new JLabel(new ImageIcon(myPicture));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                postGamePanel.add(picLabel, BorderLayout.CENTER);
+            } catch (IOException ignored) {
+                try {
+                    myPicture = ImageIO.read(new File("loser.jpg"));
+                    picLabel = new JLabel(new ImageIcon(myPicture));
+                    postGamePanel.add(picLabel, BorderLayout.CENTER);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             postGameLabel.setBackground(Color.RED);
         } else { // winner screen
             try {
-                myPicture = ImageIO.read(new File("src/sigmaSwagWinner.jpg"));
+                myPicture = ImageIO.read(new File("src/winner.jpg"));
                 picLabel = new JLabel(new ImageIcon(myPicture));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                postGamePanel.add(picLabel, BorderLayout.CENTER);
+            } catch (IOException ignored) {
+                try {
+                    myPicture = ImageIO.read(new File("winner.jpg"));
+                    picLabel = new JLabel(new ImageIcon(myPicture));
+                    postGamePanel.add(picLabel, BorderLayout.CENTER);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             postGameLabel.setBackground(Color.WHITE);
-
         }
-        postGamePanel.add(picLabel, BorderLayout.CENTER);
 
         postGameLabel.setHorizontalAlignment(JLabel.CENTER);
         postGameLabel.setBorder(
