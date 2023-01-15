@@ -19,6 +19,22 @@ public class GameGui {
     private JSpinner rowSpinner, colSpinner, targetSpinner, moveSpinner;
 
     GameGui() {
+        // change look and feel to nimbus
+        // source: https://docs.oracle.com/javase/tutorial/uiswing/lookandfeel/index.html
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.put("nimbusBase", Color.gray); // spinners
+                    UIManager.put("nimbusBlueGrey", Color.lightGray); //buttons
+                    UIManager.put("control", Color.lightGray); // background
+
+
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+
         mainMenu();
     }
 
