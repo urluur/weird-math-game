@@ -8,7 +8,8 @@ public class GridButton extends JButton {
         super(randomNumber + "");
         this.row = row;
         this.col = col;
-        this.value = randomNumber;
+        value = randomNumber;
+        setFocusable(false);
     }
 
     public int getRow() {
